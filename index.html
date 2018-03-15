@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Articles AJAX filter</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+    </head>
+    <body>
+        <div>Articles AJAX filter</div>
+        <br>
+        <!--Sizes list-->
+            <div class="list-item">
+                <div class="list-item__hd">
+                    <!--<span class="list-item__hd-ttl">Размер</span>&nbsp;|&nbsp;<a href="javascript:void(0)" class="list-item__hd-href" id="show_all_sizes" onclick="show_all_sizes();">ВСЕ</a><a href="javascript:void(0)" class="list-item__hd-href" id="show_top_sizes" style="display:none;" onclick="show_top_sizes();">ПОПУЛЯРНЫЕ</a>-->
+                    <span class="list-item__hd-ttl">Размер</span><!--&nbsp;|&nbsp;<a href="javascript:void(0)" class="list-item__hd-href" id="show_all_sizes" style="display:none;" onclick="show_all_sizes();">ВСЕ</a><a href="javascript:void(0)" class="list-item__hd-href" id="show_top_sizes" onclick="show_top_sizes();">ПОПУЛЯРНЫЕ</a>-->
+                </div>
+                <ul class="list-item__pr" id="show_all_sizes_list">
+                    <li>
+                        <input id="size8" type="checkbox" name="size_f[]" value="8">
+                        <label for="size8">13-19 см</label>
+                    </li>
+                    <li>
+                        <input id="size140000013" type="checkbox" name="size_f[]" value="140000013">
+                        <label for="size140000013">44</label>
+                    </li>
+                    <li>
+                        <input id="size130000012" type="checkbox" name="size_f[]" value="130000012">
+                        <label for="size130000012">43</label>
+                    </li>
+                    <li>
+                        <input id="size120000011" type="checkbox" name="size_f[]" value="120000011">
+                        <label for="size120000011">42</label>
+                    </li>
+                </ul>
+            </div>
+            <!--Colors list-->
+            <div class="list-item">
+                <div class="list-item__hd">
+                    <!--<span class="list-item__hd-ttl">Цвет</span>&nbsp;|&nbsp;<a href="javascript:void(0)" class="list-item__hd-href" id="show_all_colors" onclick="show_all_colors();">ВСЕ</a><a href="javascript:void(0)" class="list-item__hd-href" id="show_top_colors" style="display:none;" onclick="show_top_colors();">ПОПУЛЯРНЫЕ</a>-->
+                    <span class="list-item__hd-ttl">Цвет</span><!--&nbsp;|&nbsp;<a href="javascript:void(0)" class="list-item__hd-href" id="show_all_colors" style="display:none;" onclick="show_all_colors();">ВСЕ</a><a href="javascript:void(0)" class="list-item__hd-href" id="show_top_colors" onclick="show_top_colors();">ПОПУЛЯРНЫЕ</a>-->
+                </div>
+                <ul class="list-item__pr list-item__pr-colors" id="show_all_colors_list">
+                    <li>
+                        <input id="color20151221189" type="checkbox" name="color_f[]" value="20151221189">
+                        <label for="color20151221189">
+                            <span class="colored"><img src="./54c0a.jpg" height="18" width="18"></span>
+                            <span>как на фото</span>
+                        </label>
+                    </li>
+                    <li>
+                        <input id="color30" type="checkbox" name="color_f[]" value="30">
+                        <label for="color30">
+                            <span class="colored"><img src="./54a00.jpg" height="18" width="18"></span>
+                            <span>Фиолетовый</span>
+                        </label>
+                    </li>
+                    <li>
+                        <input id="color98" type="checkbox" name="color_f[]" value="98">
+                        <label for="color98">
+                            <span class="colored"><img src="http://test/upload/colors/54a00a23b996a.jpg" height="18" width="18"></span>
+                            <span>Голубой</span>
+                        </label>
+                    </li>
+                    <li>
+                        <input id="color9" type="checkbox" name="color_f[]" value="9">
+                        <label for="color9">
+                            <span class="colored"><img src="./saved_res.jpg" height="18" width="18"></span>
+                            <span>Розовый</span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+
+        <script src="http://code.jquery.com/jquery-1.6.2.min.js"></script>
+
+        <script type="text/javascript">
+            $("[name *= size_f],[name *= color_f]").change(function () {
+                //console.log("Ok!");
+
+                var setAllSizes = 0;
+                var arrSize = $("[name *= size_f]:checked").map(function(){
+                        return $(this).attr('value');
+                }).get();
+                if ($("[name *= size_f]:checked").length == 0) {
+                        setAllSizes = 1;
+                        arrSize = $("[name *= size_f]").map(function(){
+                        return $(this).attr('value');
+                }).get();
+                }
+
+                var setAllColors = 0;
+                var arrColor = $("[name *= color_f]:checked").map(function(){
+                        return $(this).attr('value');
+                }).get();
+                if ($("[name *= color_f]:checked").length == 0) {
+                        setAllColors = 1;
+                        arrColor = $("[name *= color_f]").map(function(){
+                        return $(this).attr('value');
+                }).get();
+                }
+
+                //Ajax sizes
+                var what_ajax = 'ajax_size';
+                $.ajax({
+                        url: "/ajax/filter.php",
+                        type: 'POST',
+                        dataType: 'text',
+                        data: ("color="+arrColor+"&setAllColors="+setAllColors+"&what_ajax="+what_ajax),
+                        success: function (data_sizes) {
+                                var sizes = JSON.parse(data_sizes);
+                                //set class strikethrough for all size labels
+                                var jquery_size_all = "[for *= size]";
+
+                                $(jquery_size_all).attr('class','strikethrough');
+
+                                //unset class strikethrough for labels of received sizes
+                                if (sizes !== null)
+                                for (i = 0; i < sizes.length; i++) {
+                                        var jquery_size = "[for = size"+sizes[i]+"]";
+                                        $(jquery_size).removeAttr("class");
+                                }
+                        }
+                });
+
+                //Ajax colors
+                var what_ajax = 'ajax_color';
+                $.ajax({
+                        url: "/ajax/filter.php",
+                        type: 'POST',
+                        dataType: 'text',
+                        data: ("size="+arrSize+"&setAllSizes="+setAllSizes+"&what_ajax="+what_ajax),
+                        success: function (data_colors) {
+                                var colors = JSON.parse(data_colors);
+                                //set class strikethrough for all color labels
+                                var jquery_color_all = "[for *= color]";
+                                $(jquery_color_all).attr('class','strikethrough');
+                                //unset class strikethrough for labels of received colors
+                                if (colors !== null)
+                                for (i = 0; i < colors.length; i++) {
+                                        var jquery_color = "[for = color"+colors[i]+"]";
+                                        $(jquery_color).removeAttr("class");
+                                }
+                        }
+                });
+            });
+        </script>       
+    </body>
+</html>
